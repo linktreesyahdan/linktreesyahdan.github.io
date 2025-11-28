@@ -500,6 +500,10 @@
     </div>
   </footer>
 
+  <button class="toggle-mode" onclick="toggleDarkMode()">
+    <i class="fas fa-moon"></i>
+  </button>
+
 <script>
   let isDarkMode = false;
 
@@ -533,7 +537,35 @@
     const kategori = document.getElementById('kategori').value;
     const deskripsi = document.getElementById('deskripsi').value.trim();
     const deadline = document.getElementById('deadline').value.trim();
-    return nama && judul && kategori && deskripsi && deadline;
+    
+    // Validasi apakah semua field terisi
+    if (!nama || !judul || !kategori || !deskripsi || !deadline) {
+      return false;
+    }
+    
+    // Validasi deadline
+    return validateDeadline(deadline);
+  }
+
+  function validateDeadline(deadline) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set waktu ke awal hari
+    
+    const selectedDate = new Date(deadline);
+    selectedDate.setHours(0, 0, 0, 0); // Set waktu ke awal hari
+    
+    // Jika deadline adalah hari sebelumnya atau hari ini
+    if (selectedDate <= today) {
+      Swal.fire({
+        title: 'Deadline Tidak Valid!',
+        text: 'Deadline harus di hari esok atau setelahnya. Silakan pilih tanggal yang valid.',
+        icon: 'error',
+        confirmButtonColor: '#4361ee'
+      });
+      return false;
+    }
+    
+    return true;
   }
 
   function resetForm() {
@@ -542,12 +574,6 @@
 
   function kirimViaWA() {
     if (!validateForm()) {
-      Swal.fire({
-        title: 'Oops!',
-        text: 'Isi semua data terlebih dahulu ya!',
-        icon: 'error',
-        confirmButtonColor: '#4361ee'
-      });
       return;
     }
 
@@ -569,12 +595,6 @@
 
   function kirimViaEmail() {
     if (!validateForm()) {
-      Swal.fire({
-        title: 'Oops!',
-        text: 'Isi semua data terlebih dahulu ya!',
-        icon: 'error',
-        confirmButtonColor: '#4361ee'
-      });
       return;
     }
 
@@ -593,6 +613,18 @@
       resetForm();
     }, 1500);
   }
+
+  // Set minimum date untuk input deadline (besok)
+  document.addEventListener('DOMContentLoaded', function() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Format tanggal untuk input date (YYYY-MM-DD)
+    const formattedDate = tomorrow.toISOString().split('T')[0];
+    
+    // Set atribut min pada input deadline
+    document.getElementById('deadline').setAttribute('min', formattedDate);
+  });
 </script>
 </body>
 </html>
